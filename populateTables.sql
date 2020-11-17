@@ -1,3 +1,14 @@
+/*DELETE FROM Elemental_Interactions;
+DELETE FROM Character_Rewards;
+DELETE FROM Enemy_Rewards;
+DELETE FROM Elite_Rewards;
+DELETE FROM Domain_Rewards;
+DELETE FROM Characters;
+DELETE FROM Enemies;
+DELETE FROM Elites;
+DELETE FROM Domains;
+DELETE FROM Rewards;*/
+
 INSERT INTO Characters (name, element) VALUES
 	("Amber", "Pyro"),
 	("Barbara", "Hydro"),
