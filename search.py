@@ -43,7 +43,7 @@ def search_enemy():
         cursor.execute("""SELECT Rewards.name AS Name, min_level AS Level FROM Enemies
                                JOIN Enemy_Rewards USING (enemy_id) 
                                JOIN Rewards USING (reward_id)
-                               WHERE Enemies.name = {}""".format(enemy))
+                               WHERE Enemies.name = '{}';""".format(enemy))
         print("\n{} drops the following:\n")
         for result in cursor.fetchall():
             if (result['Level'] == 0):
@@ -71,7 +71,7 @@ def search_character():
         cursor.execute("""SELECT Rewards.name AS Name FROM Characters
                                JOIN Character_Rewards USING (character_id) 
                                JOIN Rewards USING (reward_id)
-                               WHERE Characters.name = {}""".format(character))
+                               WHERE Characters.name = '{}';""".format(character))
         print("\n{} requires the following ascension materials:\n")
         for result in cursor.fetchall():
             print("  {}\n".format(result['Name']))
@@ -96,7 +96,7 @@ def search_domain():
         cursor.execute("""SELECT Rewards.name AS Name, min_level AS Level FROM Domains
                                JOIN Domain_Rewards USING (domain_id) 
                                JOIN Rewards USING (reward_id)
-                               WHERE Domains.name = {}""".format(domain))
+                               WHERE Domains.name = '{}';""".format(domain))
         print("\n{} rewards 100 Adventure Rank experience and the following:\n")
         for result in cursor.fetchall():
             print("  {} starting at Adventure Rank {}\n".format(result['Name'], result['Level']))
@@ -122,23 +122,23 @@ def search_item():
                           (SELECT Enemies.name AS Name, min_level AS Level FROM Rewards 
                                JOIN Enemy_Rewards USING (reward_id) 
                                JOIN Enemies USING (enemy_id)
-                               WHERE Rewards.name = {}
+                               WHERE Rewards.name = '{}'
                            UNION
                            SELECT Domains.name AS Name, min_level AS Level FROM Rewards 
                                JOIN Domain_Rewards USING (reward_id) 
                                JOIN Domains USING (domain_id)
-                               WHERE Rewards.name = {}
+                               WHERE Rewards.name = '{}'
                            UNION
                            SELECT Elites.name AS Name, min_level AS Level FROM Rewards 
                                JOIN Elite_Rewards USING (reward_id) 
                                JOIN Elites USING (elite_id)
-                               WHERE Rewards.name = {}
+                               WHERE Rewards.name = '{}'
                            UNION
                            SELECT Characters.name AS Name, min_level AS Level FROM Rewards 
                                JOIN Character_Rewards USING (reward_id) 
                                JOIN Characters USING (character_id)
-                               WHERE Rewards.name = {}
-                           )""".format(item, item, item, item))
+                               WHERE Rewards.name = '{}'
+                           )search;""".format(item, item, item, item))
         charFlag = False
         for result in cursor.fetchall():
             if (result['Name'] in domains):
