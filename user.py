@@ -10,6 +10,7 @@ from deleteFromElites import *
 from deleteFromDomains import *
 from deleteFromCharacters import *
 from deleteFromRewards import *
+from search.py import *
 
 def add_to_database():
     print("List of available tables: ")
@@ -73,7 +74,8 @@ def start_up_manager():
         print("     4. Exit")
         user = int(input("Enter the number of your choice: "))
         if user == 1:
-            print()
+            search()
+            user = 0
         elif user == 2:
             add_to_database()
             user = 0
@@ -93,7 +95,8 @@ def start_up_user():
     user = int(input("Enter the number of your choice: "))
     while user != 0:
         if user == 1:
-            print("hello")
+           search()
+           user = 0
         elif user == 2:
             print("Thanks for using the database!")
             user = 0
