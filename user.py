@@ -19,7 +19,7 @@ def add_to_database():
     print("    4. Domains")
     print("    5. Characters")
     print("    6. Rewards")
-    print("     0. To Quit")
+    print("    0. To Quit")
     user = int(input("Which table would you like to insert into? "))
     if user == 1:
         add_to_database_elemental()
@@ -37,6 +37,31 @@ def add_to_database():
         print("     Goodbye.")
         start_up_manager()
     
+def delete_from_database():
+    print("List of available tables: ")
+    print("    1. Elemental_Interactions")
+    print("    2. Enemies")
+    print("    3. Elites")
+    print("    4. Domains")
+    print("    5. Characters")
+    print("    6. Rewards")
+    print("    0. To Quit")
+    user = int(input("Which table would you like to insert into? "))
+    if user == 1:
+        delete_from_elemental()
+    elif user == 2:
+       delete_from_enemy()
+    elif user == 3:
+        delete_from_elite()
+    elif user == 4:
+        delete_from_domains()
+    elif user == 5:
+        delete_from_characters()
+    elif user == 6:
+        delete_from_rewards()
+    if user == 0:
+        print("     Goodbye.")
+        start_up_manager()
 
 def start_up_manager():
     user = 5
@@ -53,7 +78,8 @@ def start_up_manager():
             add_to_database()
             user = 0
         elif user == 3:
-            print()
+            delete_from_database()
+            user = 0;
         elif user == 4:
             print("Thanks for using the database!")
             user = 0
