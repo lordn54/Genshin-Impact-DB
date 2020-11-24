@@ -10,7 +10,7 @@ from deleteFromElites import *
 from deleteFromDomains import *
 from deleteFromCharacters import *
 from deleteFromRewards import *
-from search.py import *
+from search import *
 
 def add_to_database():
     print("List of available tables: ")
@@ -20,23 +20,29 @@ def add_to_database():
     print("    4. Domains")
     print("    5. Characters")
     print("    6. Rewards")
-    print("    0. To Quit")
+    print("    7. Back")
     user = int(input("Which table would you like to insert into? "))
     if user == 1:
         add_to_database_elemental()
+        add_to_database()
     elif user == 2:
         add_to_database_enemy()
+        add_to_database()
     elif user == 3:
         add_to_database_elite()
+        add_to_database()
     elif user == 4:
         add_to_database_domains()
+        add_to_database()
     elif user == 5:
         add_to_database_characters()
+        add_to_database()
     elif user == 6:
         add_to_database_rewards()
-    if user == 0:
-        print("     Goodbye.")
-        start_up_manager()
+        add_to_database()
+    if user != 7:
+        print("Invalid number try again")
+        add_to_database()
     
 def delete_from_database():
     print("List of available tables: ")
@@ -46,62 +52,65 @@ def delete_from_database():
     print("    4. Domains")
     print("    5. Characters")
     print("    6. Rewards")
-    print("    0. To Quit")
+    print("    7. Back")
     user = int(input("Which table would you like to insert into? "))
     if user == 1:
         delete_from_elemental()
+        delete_from_database()
     elif user == 2:
-       delete_from_enemy()
+        delete_from_enemy()
+        delete_from_database()
     elif user == 3:
         delete_from_elite()
+        delete_from_database()
     elif user == 4:
         delete_from_domains()
+        delete_from_database()
     elif user == 5:
         delete_from_characters()
+        delete_from_database()
     elif user == 6:
         delete_from_rewards()
-    if user == 0:
-        print("     Goodbye.")
-        start_up_manager()
+        delete_from_database()
+    elif user != 7:
+        print("Invalid number try again.")
+        delete_from_database()
 
 def start_up_manager():
-    user = 5
-    while user != 0:
-        print("What would you like to do?")
-        print("     1. Search the database")
-        print("     2. Add to the database")
-        print("     3. Remove from the database")
-        print("     4. Exit")
-        user = int(input("Enter the number of your choice: "))
-        if user == 1:
-            search()
-            user = 0
-        elif user == 2:
-            add_to_database()
-            user = 0
-        elif user == 3:
-            delete_from_database()
-            user = 0;
-        elif user == 4:
-            print("Thanks for using the database!")
-            user = 0
-        else:
-            print("Invalid number try again.")
+    print("What would you like to do?")
+    print("     1. Search the database")
+    print("     2. Add to the database")
+    print("     3. Remove from the database")
+    print("     4. Exit")
+    user = int(input("Enter the number of your choice: "))
+    if user == 1:
+        search()
+        start_up_manager()
+    elif user == 2:
+        add_to_database()
+        start_up_manager()
+    elif user == 3:
+        delete_from_database()
+        start_up_manager()
+    elif user == 4:
+        print("Thanks for using the database!")
+    else:
+        print("Invalid number try again.")
+        start_up_manager()
     
 def start_up_user():
     print("What would you like to do?")
     print("     1. Search the database")
     print("     2. Exit")
     user = int(input("Enter the number of your choice: "))
-    while user != 0:
-        if user == 1:
-           search()
-           user = 0
-        elif user == 2:
-            print("Thanks for using the database!")
-            user = 0
-        else:
-            print("Invalid number try again.")
+    if user == 1:
+        search()
+        start_up_user()
+    elif user == 2:
+        print("Thanks for using the database!")
+    else:
+        print("Invalid number try again.")
+        start_up_user()
 
 def start_up():
     print("Are you a user or a manager?")

@@ -9,8 +9,9 @@ def search():
              1. Enemy
              2. Character
              3. Domain
-             4. Item
-             5. Go Back
+             4. Elite
+             5. Item
+             6. Back
              """)
     choice = raw_input('\n')
     if (choice == '1'):
@@ -23,9 +24,12 @@ def search():
         search_domain()
         search()
     elif (choice == '4'):
+        search_elite()
+        search()
+    elif (choice == '5'):
         search_item()
         search()
-    elif (choice != '5'):
+    elif (choice != '6'):
         print("\nPlease enter a valid option\n")
         search()
     
@@ -97,7 +101,7 @@ def search_domain():
                                JOIN Domain_Rewards USING (domain_id) 
                                JOIN Rewards USING (reward_id)
                                WHERE Domains.name = '{}';""".format(domain))
-        print("\n{} rewards 100 Adventure Rank experience and the following:\n")
+        print("\n{} rewards 100 Adventure Rank experience and the following:\n".format(domain))
         for result in cursor.fetchall():
             print("  {} starting at Adventure Rank {}\n".format(result['Name'], result['Level']))
     except mysql.connector.Error as error:
@@ -106,9 +110,45 @@ def search_domain():
         if mydb.is_connected():
             cursor.close()
             mydb.close()
+            
+def search_elite():
+    elite = raw_input("\nEnter the case-sensitive name of the elite: ")
+    if elite in elites:
+        try:
+            mydb = mysql.connector.connect(
+              host='localhost',
+              user='prescott',
+              password='embryriddle',
+              database='bellb18_db',
+              unix_socket='/var/lib/mysql/mysql.sock'
+            )
+            cursor = mydb.cursor(dictionary=True)
+            args = [elite]
+            cursor.callproc("search_elite", args)
+            print("\n{} drops the following:\n".format(elite))
+            for result_cursor in cursor.stored_results():
+                for row in result_cursor:
+                    if row[1] > 0:
+                        print("  {} when fought at level {}.\n".format(row[0], row[1]))
+                    else:
+                        print("  {}.\n".format(row[0]))
+            cursor.callproc("characters_by_element", args)
+            print("Consider using one or more of the following characters:\n")
+            for result_cursor in cursor.stored_results():
+                for row in result_cursor:
+                    print("  {} to cause the {} elemental reaction.\n".format(row[0], row[1]))
+        except mysql.connector.Error as error:
+            print(error)
+        finally:
+            if mydb.is_connected():
+                cursor.close()
+                mydb.close()
+    else:
+        print("Please try again. Elite name entered invalid.\n")
 
 def search_item():
     item = raw_input("\nEnter the case-sensitive name of the item: ")
+    print("")
     try:
         mydb = mysql.connector.connect(
           host='localhost',
