@@ -34,7 +34,7 @@ def search():
         search()
     
 def search_enemy():
-    enemy = raw_input("\nEnter the case-sensitive name of the domain: ")
+    enemy = raw_input("\nEnter the case-sensitive name of the enemy: ")
     try:
         mydb = mysql.connector.connect(
           host='localhost',
@@ -44,16 +44,15 @@ def search_enemy():
           unix_socket='/var/lib/mysql/mysql.sock'
         )
         cursor = mydb.cursor(dictionary=True)
-        cursor.execute("""SELECT Rewards.name AS Name, min_level AS Level FROM Enemies
-                               JOIN Enemy_Rewards USING (enemy_id) 
-                               JOIN Rewards USING (reward_id)
-                               WHERE Enemies.name = '{}';""".format(enemy))
-        print("\n{} drops the following:\n")
-        for result in cursor.fetchall():
-            if (result['Level'] == 0):
-                print("  {}\n".format(result['Name']))
-            else:
-                print("  {} when encountered at or above level {}\n".format(result['Name'], result['Level']))
+        args = [enemy]
+        cursor.callproc("search_enemy", args)
+        print("\n{} drops the following:\n".format(enemy))
+        for result_cursor in cursor.stored_results():
+            for row in result_cursor:
+                if (row[1] == 0):
+                    print("  {}\n".format(row[0]))
+                else:
+                    print("  {} when encountered at or above level {}\n".format(row[0], row[1]))
     except mysql.connector.Error as error:
         print(error)
     finally:
@@ -62,54 +61,63 @@ def search_enemy():
             mydb.close()
 
 def search_character():
-    character = raw_input("\nEnter the case-sensitive name of the domain: ")
-    try:
-        mydb = mysql.connector.connect(
-          host='localhost',
-          user='prescott',
-          password='embryriddle',
-          database='lordn2_db',
-          unix_socket='/var/lib/mysql/mysql.sock'
-        )
-        cursor = mydb.cursor(dictionary=True)
-        cursor.execute("""SELECT Rewards.name AS Name FROM Characters
-                               JOIN Character_Rewards USING (character_id) 
-                               JOIN Rewards USING (reward_id)
-                               WHERE Characters.name = '{}';""".format(character))
-        print("\n{} requires the following ascension materials:\n")
-        for result in cursor.fetchall():
-            print("  {}\n".format(result['Name']))
-    except mysql.connector.Error as error:
-        print(error)
-    finally:
-        if mydb.is_connected():
-            cursor.close()
-            mydb.close()
+    character = raw_input("\nEnter the case-sensitive name of the character: ")
+    if character in characters:
+        try:
+            mydb = mysql.connector.connect(
+              host='localhost',
+              user='prescott',
+              password='embryriddle',
+              database='lordn2_db',
+              unix_socket='/var/lib/mysql/mysql.sock'
+            )
+            cursor = mydb.cursor(dictionary=True)
+            args = [character]
+            cursor.callproc("search_character", args)
+            print("\n{} requires the following ascension materials:\n".format(character))
+            for result_cursor in cursor.stored_results():
+                for row in result_cursor:
+                    print("  {}\n".format(row[0]))
+        except mysql.connector.Error as error:
+            print(error)
+        finally:
+            if mydb.is_connected():
+                cursor.close()
+                mydb.close()
+    else:
+        print("\nPlease try again. Character name entered invalid.\n")
 
 def search_domain():
     domain = raw_input("\nEnter the case-sensitive name of the domain: ")
-    try:
-        mydb = mysql.connector.connect(
-          host='localhost',
-          user='prescott',
-          password='embryriddle',
-          database='lordn2_db',
-          unix_socket='/var/lib/mysql/mysql.sock'
-        )
-        cursor = mydb.cursor(dictionary=True)
-        cursor.execute("""SELECT Rewards.name AS Name, min_level AS Level FROM Domains
-                               JOIN Domain_Rewards USING (domain_id) 
-                               JOIN Rewards USING (reward_id)
-                               WHERE Domains.name = '{}';""".format(domain))
-        print("\n{} rewards 100 Adventure Rank experience and the following:\n".format(domain))
-        for result in cursor.fetchall():
-            print("  {} starting at Adventure Rank {}\n".format(result['Name'], result['Level']))
-    except mysql.connector.Error as error:
-        print(error)
-    finally:
-        if mydb.is_connected():
-            cursor.close()
-            mydb.close()
+    if domain in domains:
+        try:
+            mydb = mysql.connector.connect(
+              host='localhost',
+              user='prescott',
+              password='embryriddle',
+              database='lordn2_db',
+              unix_socket='/var/lib/mysql/mysql.sock'
+            )
+            cursor = mydb.cursor(dictionary=True)
+            args = [domain]
+            cursor.callproc("search_domain", args)
+            print("\n{} rewards 100 Adventure Rank experience and the following:\n".format(domain))
+            for result_cursor in cursor.stored_results():
+                for row in result_cursor:
+                    print("  {} starting at Adventure Rank {}\n".format(row[0], row[1]))
+            cursor.callproc("characters_by_element", args)
+            print("Consider using one or more of the following characters:\n")
+            for result_cursor in cursor.stored_results():
+                for row in result_cursor:
+                    print("  {} to cause the {} elemental reaction.\n".format(row[0], row[1]))
+        except mysql.connector.Error as error:
+            print(error)
+        finally:
+            if mydb.is_connected():
+                cursor.close()
+                mydb.close()
+    else:
+        print("\nPlease try again. Domain name entered invalid.\n")
             
 def search_elite():
     elite = raw_input("\nEnter the case-sensitive name of the elite: ")
@@ -158,44 +166,26 @@ def search_item():
           unix_socket='/var/lib/mysql/mysql.sock'
         )
         cursor = mydb.cursor(dictionary=True)
-        cursor.execute("""SELECT * FROM 
-                          (SELECT Enemies.name AS Name, min_level AS Level FROM Rewards 
-                               JOIN Enemy_Rewards USING (reward_id) 
-                               JOIN Enemies USING (enemy_id)
-                               WHERE Rewards.name = '{}'
-                           UNION
-                           SELECT Domains.name AS Name, min_level AS Level FROM Rewards 
-                               JOIN Domain_Rewards USING (reward_id) 
-                               JOIN Domains USING (domain_id)
-                               WHERE Rewards.name = '{}'
-                           UNION
-                           SELECT Elites.name AS Name, min_level AS Level FROM Rewards 
-                               JOIN Elite_Rewards USING (reward_id) 
-                               JOIN Elites USING (elite_id)
-                               WHERE Rewards.name = '{}'
-                           UNION
-                           SELECT Characters.name AS Name, min_level AS Level FROM Rewards 
-                               JOIN Character_Rewards USING (reward_id) 
-                               JOIN Characters USING (character_id)
-                               WHERE Rewards.name = '{}'
-                           )search;""".format(item, item, item, item))
+        args = [item]
+        cursor.callproc("search_item", args)
         charFlag = False
-        for result in cursor.fetchall():
-            if (result['Name'] in domains):
-                print("  It drops from {} starting at Adventure Rank {}\n".format(result['Name'], result['Level']))
-            elif (result['Name'] in elites and not charFlag):
-                if (result['Level'] == 0):
-                    print("  {} drops it\n".format(result['Name']))
+        for result_cursor in cursor.stored_results():
+            for row in result_cursor:
+                if (row[0] in domains):
+                    print("  It drops from {} starting at Adventure Rank {}\n".format(row[0], row[1]))
+                elif (row[0] in elites and not charFlag):
+                    if (row[1] == 0):
+                        print("  {} drops it\n".format(row[0]))
+                    else:
+                        print("  {} drops it starting at level {}\n".format(row[0], row[1]))
+                elif (row[0] in characters):
+                    charFlag = True
+                    print("  {} requires it for ascension\n".format(row[0]))
                 else:
-                    print("  {} drops it starting at level {}\n".format(result['Name'], result['Level']))
-            elif (result['Name'] in characters):
-                charFlag = True
-                print("  {} requires it for ascension\n".format(result['Name']))
-            else:
-                if (result['Level'] == 0):
-                    print("  {}s drop it\n".format(result['Name']))
-                else:
-                    print("  {}s drop it starting at level {}\n".format(result['Name'], result['Level']))
+                    if (row[1] == 0):
+                        print("  {}s drop it\n".format(row[0]))
+                    else:
+                        print("  {}s drop it starting at level {}\n".format(row[0], row[1]))
     except mysql.connector.Error as error:
         print(error)
     finally:
