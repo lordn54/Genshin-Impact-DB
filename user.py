@@ -1,15 +1,5 @@
-from addToDatabaseElement import *
-from addToDatabaseEnemies import *
-from addToDatabaseElites import *
-from addToDatabaseDomains import *
-from addToDatabaseCharacters import *
-from addToDatabaseRewards import *
-from deleteFromElement import *
-from deleteFromEnemies import *
-from deleteFromElites import *
-from deleteFromDomains import *
-from deleteFromCharacters import *
-from deleteFromRewards import *
+from addToDatabase import *
+from deleteFromDatabase import *
 from search import *
 
 def add_to_database():
@@ -40,7 +30,7 @@ def add_to_database():
     elif user == 6:
         add_to_database_rewards()
         add_to_database()
-    if user != 7:
+    elif user != 7:
         print("Invalid number try again")
         add_to_database()
     
@@ -53,7 +43,7 @@ def delete_from_database():
     print("    5. Characters")
     print("    6. Rewards")
     print("    7. Back")
-    user = int(input("Which table would you like to insert into? "))
+    user = int(input("Which table would you like to remove from? "))
     if user == 1:
         delete_from_elemental()
         delete_from_database()
